@@ -1,6 +1,9 @@
 version: '3.8'
 
 services:
+  # ===== API Service (Production) =====
+  # เซอร์วิสหลักของแอปพลิเคชัน Backend (NestJS)
+  # รันแอปในโหมด production สำหรับใช้งานจริง
   api:
     build:
       context: .
@@ -8,28 +11,28 @@ services:
       target: production
     container_name: task-manager-backend
     ports:
-      - "${PORT:-3000}:3000"
+      - "${PORT:-3000}:3000"  # เปิดพอร์ต 3000 สำหรับเข้าถึง API
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=${PORT:-3000}
-      - DATABASE_HOST=postgres
+      - DATABASE_HOST=postgres  # เชื่อมต่อกับ PostgreSQL ผ่านชื่อเซอร์วิส
       - DATABASE_PORT=5432
       - DATABASE_USERNAME=${DATABASE_USERNAME:-postgres}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD:-postgres}
       - DATABASE_NAME=${DATABASE_NAME:-taskmanager}
     env_file:
-      - .env
+      - .env  # โหลดตัวแปรจากไฟล์ .env
     volumes:
-      - ./logs:/app/logs
+      - ./logs:/app/logs  # เก็บ log files ไว้ในเครื่อง host
     networks:
       - task-manager-network
     depends_on:
       postgres:
-        condition: service_healthy
-    restart: unless-stopped
+        condition: service_healthy  # รอให้ PostgreSQL พร้อมก่อน
+    restart: unless-stopped  # รีสตาร์ทอัตโนมัติถ้ามีปัญหา
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-      interval: 30s
+      interval: 30s  # ตรวจสอบสุขภาพทุก 30 วินาที
       timeout: 10s
       retries: 3
       start_period: 40s
@@ -37,16 +40,18 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: 512M
+          memory: 512M  # จำกัดการใช้ RAM สูงสุด 512MB
         reservations:
           cpus: '0.5'
-          memory: 256M
+          memory: 256M  # จอง RAM ขั้นต่ำ 256MB
 
+  # ===== PostgreSQL Database =====
+  # ฐานข้อมูล PostgreSQL สำหรับเก็บข้อมูลทั้งหมด
   postgres:
     image: postgres:16-alpine
     container_name: task-manager-postgres
     ports:
-      - "${DATABASE_PORT:-5432}:5432"
+      - "${DATABASE_PORT:-5432}:5432"  # เปิดพอร์ต 5432 สำหรับเชื่อมต่อจากภายนอก
     environment:
       - POSTGRES_DB=${DATABASE_NAME:-taskmanager}
       - POSTGRES_USER=${DATABASE_USERNAME:-postgres}
@@ -54,8 +59,8 @@ services:
     env_file:
       - .env
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - postgres-data:/var/lib/postgresql/data  # เก็บข้อมูลถาวร (persistent storage)
+      - ./init-db:/docker-entrypoint-initdb.d  # สคริปต์เริ่มต้นสำหรับสร้างฐานข้อมูล
     networks:
       - task-manager-network
     restart: unless-stopped
@@ -74,7 +79,9 @@ services:
           cpus: '0.25'
           memory: 256M
 
-  # Development service
+  # ===== API Service (Development) =====
+  # เซอร์วิสสำหรับนักพัฒนา ใช้ในโหมด development
+  # มีการเปิด debug port (9229) และ auto-reload เมื่อโค้ดเปลี่ยน
   api-dev:
     build:
       context: .
@@ -83,7 +90,7 @@ services:
     container_name: task-manager-backend-dev
     ports:
       - "${PORT:-3000}:3000"
-      - "9229:9229"
+      - "9229:9229"  # พอร์ตสำหรับ Node.js debugging
     environment:
       - NODE_ENV=development
       - PORT=${PORT:-3000}
@@ -95,7 +102,7 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app
+      - .:/app  # แมปโค้ดจากเครื่อง host เข้า container (auto-reload)
       - /app/node_modules
       - ./logs:/app/logs
     networks:
@@ -103,35 +110,41 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: npm run start:dev
+    command: npm run start:dev  # รันด้วยคำสั่ง development mode
     profiles:
-      - dev
+      - dev  # ใช้เฉพาะเวลาสั่ง run ด้วย profile dev
 
-  # pgAdmin for database management (optional)
+  # ===== pgAdmin (Database Management Tool) =====
+  # เครื่องมือจัดการฐานข้อมูลผ่านเว็บ UI
+  # ใช้สำหรับดูและจัดการ PostgreSQL ง่าย ๆ
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: task-manager-pgadmin
     ports:
-      - "5050:80"
+      - "5050:80"  # เข้าถึง pgAdmin ผ่าน http://localhost:5050
     environment:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@taskmanager.com}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
     env_file:
       - .env
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmin-data:/var/lib/pgadmin  # เก็บการตั้งค่า pgadmin
     networks:
       - task-manager-network
     depends_on:
       - postgres
     restart: unless-stopped
     profiles:
-      - tools
+      - tools  # ใช้เฉพาะเวลาสั่ง run ด้วย profile tools
 
+# ===== Network Configuration =====
+# เครือข่ายสำหรับให้เซอร์วิสสื่อสารกัน
 networks:
   task-manager-network:
     driver: bridge
 
+# ===== Volume Configuration =====
+# พื้นที่เก็บข้อมูลถาวร (ไม่ลบเมื่อ container ลบ)
 volumes:
   postgres-data:
     driver: local
