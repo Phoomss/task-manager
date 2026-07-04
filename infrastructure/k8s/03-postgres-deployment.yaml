@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres-deployment
@@ -40,7 +40,7 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             successThreshold: 1
-            failureThereshold: 6
+            failureThreshold: 6
           resources:
             requests:
               memory: "256Mi"
@@ -73,14 +73,15 @@ spec:
             claimName: postgres-pvc
 ---
 apiVersion: v1
-kind: Service
+kind: Secret
 metadata:
-  name: postgres-service
+  name: postgres-secret
   namespace: task-manager
-data:
+type: Opaque
+stringData:
   username: postgres
   password: postgres
-  database: task_manager_db
+  database: taskmanager
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -88,10 +89,10 @@ metadata:
   name: postgres-pvc
   namespace: task-manager
 spec:
-  storeageClassName: standard
+  storageClassName: standard
   accessModes:
     - ReadWriteOnce
-  volumeMode: postgres-pv
+  volumeMode: Filesystem
   resources:
     requests:
       storage: 1Gi
@@ -100,7 +101,6 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: postgres-pv
-  namespace: task-manager
 spec:
   capacity:
     storage: 1Gi
