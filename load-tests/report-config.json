@@ -1,0 +1,28 @@
+{
+  "testName": "Task Management API Load Test",
+  "version": "1.0.0",
+  "k6Version": "0.49.0",
+  "reporter": {
+    "html": {
+      "outputFile": "load-tests/summary.html",
+      "title": "Task Management API Load Test Report"
+    }
+  },
+  "targets": {
+    "createTask": {
+      "description": "Test task creation endpoint",
+      "concurrency": 100,
+      "sla": "p95 < 1s"
+    },
+    "listTasks": {
+      "description": "Test task listing endpoint",
+      "concurrency": 200,
+      "sla": "p95 < 1s"
+    },
+    "updateTask": {
+      "description": "Test task update endpoint",
+      "concurrency": 50,
+      "sla": "p95 < 1s"
+    }
+  }
+}
