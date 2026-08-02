@@ -24,7 +24,7 @@ resource "aws_subnet" "public" {
 
 # internet gateway
 resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_pvc.mian.id
+  vpc_id = aws_vpc.main.id
 }
 
 # route table

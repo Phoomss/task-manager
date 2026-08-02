@@ -1,3 +1,8 @@
+resource "aws_key_pair" "kubespray_key" {
+  key_name   = var.key_name
+  public_key = file("~/.ssh/id_ed25519.pub")
+}
+
 # control plane
 resource "aws_instance" "control_plane" {
 
@@ -7,7 +12,7 @@ resource "aws_instance" "control_plane" {
 
   subnet_id = aws_subnet.public.id
 
-  key_name = var.key_name
+  key_name = aws_key_pair.kubespray_key.key_name
 
   vpc_security_group_ids = [
 
@@ -42,7 +47,7 @@ resource "aws_instance" "worker" {
 
   subnet_id = aws_subnet.public.id
 
-  key_name = var.key_name
+  key_name = aws_key_pair.kubespray_key.key_name
 
   vpc_security_group_ids = [
 
