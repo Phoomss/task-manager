@@ -5,51 +5,59 @@ resource "aws_security_group" "k8s" {
   vpc_id = aws_vpc.main.id
 
   ingress {
-
-    from_port = 22
-
-    to_port = 22
-
-    protocol = "tcp"
-
+    description = "SSH access"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-
   }
 
   ingress {
+    description = "Frontend"
+    from_port   = 3001
+    to_port     = 3001
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    from_port = 6443
+  ingress {
+    description = "Backend API"
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    to_port = 6443
-
-    protocol = "tcp"
-
+  ingress {
+    description = "Kubernetes API server"
+    from_port   = 6443
+    to_port     = 6443
+    protocol    = "tcp"
     cidr_blocks = ["10.0.0.0/16"]
-
   }
 
   ingress {
-
-    from_port = 0
-
-    to_port = 65535
-
-    protocol = "tcp"
-
-    self = true
-
+    description = "Allow all internal TCP"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    self        = true
   }
 
   ingress {
+    description = "Allow all internal UDP"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "udp"
+    self        = true
+  }
 
-    from_port = -1
-
-    to_port = -1
-
-    protocol = "icmp"
-
-    self = true
-
+  ingress {
+    description = "Allow all internal ICMP"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    self        = true
   }
 
   egress {
