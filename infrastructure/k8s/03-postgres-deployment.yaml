@@ -18,7 +18,6 @@ spec:
       containers:
         - name: postgres
           image: postgres:15
-          args: ["-c", "config_file=/etc/postgresql/postgresql.conf"]
           livenessProbe:
             exec:
               command:

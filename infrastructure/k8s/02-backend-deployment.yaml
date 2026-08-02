@@ -23,11 +23,20 @@ spec:
             - containerPort: 8080
           env:
             - name: PORT
-              value: "8080"
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: PORT
             - name: DATABASE_HOST
-              value: "postgres-service"
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_HOST
             - name: DATABASE_PORT
-              value: "5432"
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_PORT
             - name: DATABASE_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -43,6 +52,20 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: database
+            - name: DATABASE_URL
+              value: "postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?schema=public"
+          livenessProbe:
+            httpGet:
+              path: /api/tasks
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /api/tasks
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
           resources:
             requests:
               memory: "128Mi"
@@ -64,3 +87,13 @@ spec:
       port: 8080
       targetPort: 8080
   type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: task-manager
+data:
+  PORT: "8080"
+  DATABASE_HOST: "postgres-service"
+  DATABASE_PORT: "5432"
