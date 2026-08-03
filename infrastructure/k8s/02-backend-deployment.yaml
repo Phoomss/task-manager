@@ -56,15 +56,15 @@ spec:
               value: "postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?schema=public"
           livenessProbe:
             httpGet:
-              path: /api/tasks
+              path: /health
               port: 8080
-            initialDelaySeconds: 20
-            periodSeconds: 15
+            initialDelaySeconds: 30
+            periodSeconds: 20
           readinessProbe:
             httpGet:
-              path: /api/tasks
+              path: /health
               port: 8080
-            initialDelaySeconds: 15
+            initialDelaySeconds: 10
             periodSeconds: 10
           resources:
             requests:
