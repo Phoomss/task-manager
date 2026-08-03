@@ -10,8 +10,8 @@ pipeline {
     environment {
         DOCKER_REGISTRY = 'docker.io'
         DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'
-        DOCKER_REPO_BACKEND = 'taskmanager/backend'
-        DOCKER_REPO_FRONTEND = 'taskmanager/frontend'
+        DOCKER_REPO_BACKEND = 'task-manager-backend'
+        DOCKER_REPO_FRONTEND = 'task-manager-frontend'
         KUBERNETES_CREDENTIALS_ID = 'kubeconfig-credentials'
         SLACK_CHANNEL = '#ci-cd-alerts'
         IMAGE_TAG = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"

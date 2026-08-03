@@ -1,6 +1,6 @@
 # Local .terraform path
 .terraform/
-
+note.txt
 # .tfstate files
 *.tfstate
 *.tfstate.*

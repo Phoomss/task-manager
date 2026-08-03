@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
     container_name: taskspace-db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -25,6 +23,7 @@ services:
     build:
       context: ../backend
       dockerfile: Dockerfile.dev
+    image: task-manager-backend
     container_name: taskspace-backend
     ports:
       - "3000:3000"
@@ -47,6 +46,7 @@ services:
     build:
       context: ../frontend
       dockerfile: Dockerfile.dev
+    image: task-manager-frontend
     container_name: taskspace-frontend
     ports:
       - "3001:3000"
