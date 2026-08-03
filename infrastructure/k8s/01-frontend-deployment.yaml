@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: task-manager-frontend:latest
+          image: phoom005/task-manager-frontend:latest
           imagePullPolicy: Always
           ports:
           - containerPort: 3000
