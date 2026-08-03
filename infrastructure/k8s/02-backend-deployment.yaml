@@ -53,7 +53,10 @@ spec:
                   name: postgres-secret
                   key: database
             - name: DATABASE_URL
-              value: "postgresql://$(DATABASE_USERNAME):$(DATABASE_PASSWORD)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE_NAME)?schema=public"
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: DATABASE_URL
           livenessProbe:
             httpGet:
               path: /health
@@ -97,3 +100,4 @@ data:
   PORT: "8080"
   DATABASE_HOST: "postgres-service"
   DATABASE_PORT: "5432"
+  DATABASE_URL: "postgresql://postgres:postgres@postgres-service:5432/taskmanager?schema=public"
