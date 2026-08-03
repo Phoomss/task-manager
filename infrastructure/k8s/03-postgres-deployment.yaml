@@ -88,7 +88,7 @@ metadata:
   name: postgres-pvc
   namespace: task-manager
 spec:
-  storageClassName: standard
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   volumeMode: Filesystem
@@ -101,6 +101,7 @@ kind: PersistentVolume
 metadata:
   name: postgres-pv
 spec:
+  storageClassName: ""
   capacity:
     storage: 1Gi
   accessModes:
