@@ -9,10 +9,7 @@ yarn-error.log*
 out
 build
 
-# Environment files
-.env
-.env.local
-.env.*.local
+
 
 # IDE
 .idea
