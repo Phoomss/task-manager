@@ -54,7 +54,7 @@ export function createTask() {
     status: 'pending',
   });
 
-  const res = http.post(`${BASE_URL}/tasks`, payload, params);
+  const res = http.post(`${BASE_URL}/api/tasks`, payload, params);
 
   check(res, {
     'create_task: status is 201': (r) => r.status === 201 || r.status === 200,
@@ -66,7 +66,7 @@ export function createTask() {
 
 // LT-02: List Tasks
 export function listTasks() {
-  const res = http.get(`${BASE_URL}/tasks`, params);
+  const res = http.get(`${BASE_URL}/api/tasks`, params);
 
   check(res, {
     'list_tasks: status is 200': (r) => r.status === 200,
@@ -86,7 +86,7 @@ export function updateTask() {
     status: 'pending',
   });
 
-  const createRes = http.post(`${BASE_URL}/tasks`, createPayload, params);
+  const createRes = http.post(`${BASE_URL}/api/tasks`, createPayload, params);
   const isCreated = check(createRes, {
     'update_scenario: task created': (r) => r.status === 201 || r.status === 200,
   });
@@ -111,7 +111,7 @@ export function updateTask() {
       priority: 'high',
     });
 
-    const updateRes = http.patch(`${BASE_URL}/tasks/${taskId}`, updatePayload, params);
+    const updateRes = http.patch(`${BASE_URL}/api/tasks/${taskId}`, updatePayload, params);
 
     check(updateRes, {
       'update_task: status is 200': (r) => r.status === 200,
@@ -119,7 +119,7 @@ export function updateTask() {
     });
 
     // 3. Clean up (Optional, but keeps the database clean during load test runs)
-    const deleteRes = http.del(`${BASE_URL}/tasks/${taskId}`, null, params);
+    const deleteRes = http.del(`${BASE_URL}/api/tasks/${taskId}`, null, params);
     check(deleteRes, {
       'update_scenario: task deleted': (r) => r.status === 200 || r.status === 204,
     });
